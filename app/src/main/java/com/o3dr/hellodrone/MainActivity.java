@@ -57,10 +57,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     private static final int DEFAULT_UDP_PORT = 14550;
     private static final int DEFAULT_USB_BAUD_RATE = 57600;
 
-    private Spinner modeSelector;
-    private Button startVideoStream;
-    private Button stopVideoStream;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,91 +65,12 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         final Context context = getApplicationContext();
         this.controlTower = new ControlTower(context);
         this.drone = new Drone(context);
-
-        this.modeSelector = (Spinner) findViewById(R.id.modeSelect);
-        this.modeSelector.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                onFlightModeSelected(view);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
-            }
-        });
-
-        //Setup the button to trigger the GoPro camera to take a picture.
-        final Button takePic = (Button) findViewById(R.id.take_photo_button);
-        takePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takePhoto();
-            }
-        });
-
-        //Setup the button to trigger the GoPro camera to start video recording.
-        final Button toggleVideo = (Button) findViewById(R.id.toggle_video_recording);
-        toggleVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleVideoRecording();
-            }
-        });
-
-        final TextureView videoView = (TextureView) findViewById(R.id.video_content);
-        videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                alertUser("Video display is available.");
-                startVideoStream.setEnabled(true);
-            }
-
-            @Override
-            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-            }
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                startVideoStream.setEnabled(false);
-                return true;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-            }
-        });
-
-        //Setup the button to activate video streaming to the Hello Drone app
-        startVideoStream = (Button) findViewById(R.id.start_video_stream);
-        startVideoStream.setEnabled(false);
-        startVideoStream.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertUser("Starting video stream.");
-                startVideoStream(new Surface(videoView.getSurfaceTexture()));
-            }
-        });
-
-        //Setup the button to stop video streaming to the Hello Drone app
-        stopVideoStream = (Button) findViewById(R.id.stop_video_stream);
-        stopVideoStream.setEnabled(false);
-        stopVideoStream.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertUser("Stopping video stream.");
-                stopVideoStream();
-            }
-        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
         this.controlTower.connect(this);
-        updateVehicleModesForType(this.droneType);
     }
 
     @Override
@@ -193,31 +110,17 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             case AttributeEvent.STATE_CONNECTED:
                 alertUser("Drone Connected");
                 updateConnectedButton(this.drone.isConnected());
-                updateArmButton();
-                checkSoloState();
                 break;
 
             case AttributeEvent.STATE_DISCONNECTED:
                 alertUser("Drone Disconnected");
                 updateConnectedButton(this.drone.isConnected());
-                updateArmButton();
                 break;
 
             case AttributeEvent.STATE_UPDATED:
             case AttributeEvent.STATE_ARMING:
-                updateArmButton();
-                break;
-
             case AttributeEvent.TYPE_UPDATED:
-                Type newDroneType = this.drone.getAttribute(AttributeType.TYPE);
-                if (newDroneType.getDroneType() != this.droneType) {
-                    this.droneType = newDroneType.getDroneType();
-                    updateVehicleModesForType(this.droneType);
-                }
-                break;
-
             case AttributeEvent.STATE_VEHICLE_MODE:
-                updateVehicleMode();
                 break;
 
             case AttributeEvent.SPEED_UPDATED:
@@ -232,21 +135,11 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 updateDistanceFromHome();
                 break;
 
-
             default:
-//                Log.i("DRONE_EVENT", event); //Uncomment to see events from the drone
+                Log.i("DRONE_EVENT", event); //Uncomment to see events from the drone
                 break;
         }
 
-    }
-
-    private void checkSoloState() {
-        final SoloState soloState = drone.getAttribute(SoloAttributes.SOLO_STATE);
-        if (soloState == null) {
-            alertUser("Unable to retrieve the solo state.");
-        } else {
-            alertUser("Solo state is up to date.");
-        }
     }
 
     @Override
@@ -282,81 +175,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     }
 
-    public void onFlightModeSelected(View view) {
-        VehicleMode vehicleMode = (VehicleMode) this.modeSelector.getSelectedItem();
-
-        VehicleApi.getApi(this.drone).setVehicleMode(vehicleMode, new AbstractCommandListener() {
-            @Override
-            public void onSuccess() {
-                alertUser("Vehicle mode change successful.");
-            }
-
-            @Override
-            public void onError(int executionError) {
-                alertUser("Vehicle mode change failed: " + executionError);
-            }
-
-            @Override
-            public void onTimeout() {
-                alertUser("Vehicle mode change timed out.");
-            }
-        });
-    }
-
-    public void onArmButtonTap(View view) {
-        State vehicleState = this.drone.getAttribute(AttributeType.STATE);
-
-        if (vehicleState.isFlying()) {
-            // Land
-            VehicleApi.getApi(this.drone).setVehicleMode(VehicleMode.COPTER_LAND, new SimpleCommandListener() {
-                @Override
-                public void onError(int executionError) {
-                    alertUser("Unable to land the vehicle.");
-                }
-
-                @Override
-                public void onTimeout() {
-                    alertUser("Unable to land the vehicle.");
-                }
-            });
-        } else if (vehicleState.isArmed()) {
-            // Take off
-            ControlApi.getApi(this.drone).takeoff(10, new AbstractCommandListener() {
-
-                @Override
-                public void onSuccess() {
-                    alertUser("Taking off...");
-                }
-
-                @Override
-                public void onError(int i) {
-                    alertUser("Unable to take off.");
-                }
-
-                @Override
-                public void onTimeout() {
-                    alertUser("Unable to take off.");
-                }
-            });
-        } else if (!vehicleState.isConnected()) {
-            // Connect
-            alertUser("Connect to a drone first");
-        } else {
-            // Connected but not Armed
-            VehicleApi.getApi(this.drone).arm(true, false, new SimpleCommandListener() {
-                @Override
-                public void onError(int executionError) {
-                    alertUser("Unable to arm vehicle.");
-                }
-
-                @Override
-                public void onTimeout() {
-                    alertUser("Arming operation timed out.");
-                }
-            });
-        }
-    }
-
     // UI updating
     // ==========================================================
 
@@ -366,28 +184,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             connectButton.setText("Disconnect");
         } else {
             connectButton.setText("Connect");
-        }
-    }
-
-    protected void updateArmButton() {
-        State vehicleState = this.drone.getAttribute(AttributeType.STATE);
-        Button armButton = (Button) findViewById(R.id.btnArmTakeOff);
-
-        if (!this.drone.isConnected()) {
-            armButton.setVisibility(View.INVISIBLE);
-        } else {
-            armButton.setVisibility(View.VISIBLE);
-        }
-
-        if (vehicleState.isFlying()) {
-            // Land
-            armButton.setText("LAND");
-        } else if (vehicleState.isArmed()) {
-            // Take off
-            armButton.setText("TAKE OFF");
-        } else if (vehicleState.isConnected()) {
-            // Connected but not Armed
-            armButton.setText("ARM");
         }
     }
 
@@ -423,21 +219,6 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         distanceTextView.setText(String.format("%3.1f", distanceFromHome) + "m");
     }
 
-    protected void updateVehicleModesForType(int droneType) {
-
-        List<VehicleMode> vehicleModes = VehicleMode.getVehicleModePerDroneType(droneType);
-        ArrayAdapter<VehicleMode> vehicleModeArrayAdapter = new ArrayAdapter<VehicleMode>(this, android.R.layout.simple_spinner_item, vehicleModes);
-        vehicleModeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.modeSelector.setAdapter(vehicleModeArrayAdapter);
-    }
-
-    protected void updateVehicleMode() {
-        State vehicleState = this.drone.getAttribute(AttributeType.STATE);
-        VehicleMode vehicleMode = vehicleState.getVehicleMode();
-        ArrayAdapter arrayAdapter = (ArrayAdapter) this.modeSelector.getAdapter();
-        this.modeSelector.setSelection(arrayAdapter.getPosition(vehicleMode));
-    }
-
     // Helper methods
     // ==========================================================
 
@@ -455,79 +236,4 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         double dz = pointA.getAltitude() - pointB.getAltitude();
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
-
-    private void takePhoto() {
-        SoloCameraApi.getApi(drone).takePhoto(new AbstractCommandListener() {
-            @Override
-            public void onSuccess() {
-                alertUser("Photo taken.");
-            }
-
-            @Override
-            public void onError(int executionError) {
-                alertUser("Error while trying to take the photo: " + executionError);
-            }
-
-            @Override
-            public void onTimeout() {
-                alertUser("Timeout while trying to take the photo.");
-            }
-        });
-    }
-
-    private void toggleVideoRecording() {
-        SoloCameraApi.getApi(drone).toggleVideoRecording(new AbstractCommandListener() {
-            @Override
-            public void onSuccess() {
-                alertUser("Video recording toggled.");
-            }
-
-            @Override
-            public void onError(int executionError) {
-                alertUser("Error while trying to toggle video recording: " + executionError);
-            }
-
-            @Override
-            public void onTimeout() {
-                alertUser("Timeout while trying to toggle video recording.");
-            }
-        });
-    }
-
-    private void startVideoStream(Surface videoSurface) {
-        SoloCameraApi.getApi(drone).startVideoStream(videoSurface, "", true, new AbstractCommandListener() {
-            @Override
-            public void onSuccess() {
-                if (stopVideoStream != null)
-                    stopVideoStream.setEnabled(true);
-
-                if (startVideoStream != null)
-                    startVideoStream.setEnabled(false);
-            }
-
-            @Override
-            public void onError(int executionError) {
-                alertUser("Error while starting the video stream: " + executionError);
-            }
-
-            @Override
-            public void onTimeout() {
-                alertUser("Timed out while attempting to start the video stream.");
-            }
-        });
-    }
-
-    private void stopVideoStream() {
-        SoloCameraApi.getApi(drone).stopVideoStream(new SimpleCommandListener() {
-            @Override
-            public void onSuccess() {
-                if (stopVideoStream != null)
-                    stopVideoStream.setEnabled(false);
-
-                if (startVideoStream != null)
-                    startVideoStream.setEnabled(true);
-            }
-        });
-    }
-
 }
