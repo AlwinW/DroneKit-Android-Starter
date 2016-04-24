@@ -170,32 +170,32 @@
                             android:textAppearance="?android:attr/textAppearanceMedium" />
                     </TableRow>
 
-                    <!--<TableRow
-                        android:id="@+id/vehTelemRow4"
+                    <TableRow
+                        android:id="@+id/vehTelemRow9"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
 
                         <TextView
-                            android:id="@+id/distanceLabelTextView"
+                            android:id="@+id/satcountLabelTextView"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:layout_column="0"
                             android:paddingBottom="5dp"
                             android:paddingTop="5dp"
-                            android:text="Distance:"
+                            android:text="Satellites:"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                         <TextView
-                            android:id="@+id/distanceValueTextView"
+                            android:id="@+id/SatCountValueTextView"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_column="1"
                             android:layout_gravity="left"
                             android:paddingBottom="5dp"
                             android:paddingTop="5dp"
-                            android:text="0m"
+                            android:text="0/8"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
-                    </TableRow>-->
+                    </TableRow>
 
                     <TableRow
                         android:id="@+id/vehTelemRow5"

@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
             case AttributeEvent.ALTITUDE_UPDATED:
                 updateAltitude();
+                updateSatCount();
                 updateLat();
                 updateLong();
                 updateRoll();
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 break;
 
             case AttributeEvent.GPS_POSITION:
+                updateSatCount();
                 updateLat();
                 updateLong();
                 updateRoll();
@@ -232,6 +234,14 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
         distanceTextView.setText(String.format("%3.1f", distanceFromHome) + "m");
     }*/
+
+    protected void updateSatCount() {
+        TextView latTextView = (TextView) findViewById(R.id.SatCountValueTextView);
+        Gps droneGps = this.drone.getAttribute(AttributeType.GPS);
+        double satcount = droneGps.getSatellitesCount();
+
+        latTextView.setText(String.format("%8.0f",satcount) + "/8");
+    }
 
     protected void updateLat() {
         TextView latTextView = (TextView) findViewById(R.id.latValueTextView);
