@@ -83,13 +83,13 @@
                 <TableLayout
                     android:id="@+id/telemetryInfo"
                     android:layout_width="fill_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="300dp"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/telemetryLabel"
                     android:layout_marginTop="10dp">
 
-                    <TableRow
+                    <!--<TableRow
                         android:id="@+id/vehTelemRow1"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
@@ -114,7 +114,7 @@
                             android:layout_column="1"
                             android:layout_toLeftOf="@+id/btnConnect"
                             android:spinnerMode="dropdown" />
-                    </TableRow>
+                    </TableRow>-->
 
                     <TableRow
                         android:id="@+id/vehTelemRow2"
@@ -170,7 +170,7 @@
                             android:textAppearance="?android:attr/textAppearanceMedium" />
                     </TableRow>
 
-                    <TableRow
+                    <!--<TableRow
                         android:id="@+id/vehTelemRow4"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
@@ -195,24 +195,142 @@
                             android:paddingTop="5dp"
                             android:text="0m"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
-                    </TableRow>
+                    </TableRow>-->
 
                     <TableRow
+                        android:id="@+id/vehTelemRow5"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
 
-                        <Button
-                            android:id="@+id/btnArmTakeOff"
-                            android:layout_width="120dp"
+                        <TextView
+                            android:id="@+id/latLabelTextView"
+                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_below="@+id/connectionTypeLabel"
+                            android:layout_column="0"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="Latitude:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:id="@+id/latValueTextView"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
                             android:layout_column="1"
-                            android:onClick="onArmButtonTap"
-                            android:visibility="invisible" />
+                            android:layout_gravity="left"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="0°"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
                     </TableRow>
 
+                    <TableRow
+                        android:id="@+id/vehTelemRow6"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <TextView
+                            android:id="@+id/longLabelTextView"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_column="0"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="Longtitude:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:id="@+id/longValueTextView"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_column="1"
+                            android:layout_gravity="left"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="0°"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/vehTelemRow7"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <TextView
+                            android:id="@+id/RollLabelTextView"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_column="0"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="Roll:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:id="@+id/RollValueTextView"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_column="1"
+                            android:layout_gravity="left"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="0°"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/vehTelemRow8"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <TextView
+                            android:id="@+id/PitchLabelTextView"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_column="0"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="Pitch:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:id="@+id/PitchValueTextView"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_column="1"
+                            android:layout_gravity="left"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="0°"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/vehTelemRow9"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <TextView
+                            android:id="@+id/YawLabelTextView"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_column="0"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="Yaw:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:id="@+id/YawValueTextView"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_column="1"
+                            android:layout_gravity="left"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:text="0°"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </TableRow>
                 </TableLayout>
 
             </RelativeLayout>
